@@ -1,10 +1,35 @@
+def chop(
+        number,
+        int_array,
+        cumulative_index=0
+):
+    empty = -1
+    if is_empty(int_array):
+        return empty
+    if is_not_single_element_match(number, int_array):
+        return empty
+
+    midpoint = halfway(int_array)
+    element_at_midpoint = int_array[midpoint]
+
+    if is_match(number, element_at_midpoint):
+        return adjusted_index(cumulative_index, midpoint)
+    elif is_number_above_midpoint(number, element_at_midpoint):
+        cumulative_index = adjusted_index(midpoint, cumulative_index)
+        return chop(number, int_array[midpoint::], cumulative_index)
+    elif is_number_below_midpoint(number, element_at_midpoint):
+        return chop(number, int_array[0:midpoint])
+
+
+def halfway(int_array):
+    return int.__floordiv__(len(int_array), 2)
 
 
 def is_empty(int_array):
     return len(int_array) == 0
 
 
-def single_element_not_found(number, int_array):
+def is_not_single_element_match(number, int_array):
     return len(int_array) == 1 and int_array[0] != number
 
 
@@ -12,36 +37,13 @@ def is_match(number, element):
     return number == element
 
 
-def number_in_upper_half(number, int_array, halfway_index):
-    return int_array[halfway_index] < number
+def is_number_above_midpoint(number, halfway_element):
+    return halfway_element < number
 
 
-def number_in_lower_half(number, int_array, halfway_index):
-    return int_array[halfway_index] > number
+def is_number_below_midpoint(number, halfway_element):
+    return halfway_element > number
 
 
-def chop(
-        number,
-        int_array,
-        current_index=0
-):
-    halfway_index = int.__floordiv__(len(int_array), 2)
-    if is_empty(int_array):
-        return -1
-    if single_element_not_found(number, int_array):
-        return -1
-
-    if is_match(number, int_array[halfway_index]):
-        return halfway_index + current_index
-    elif number_in_upper_half(number, int_array, halfway_index):
-        current_index = current_index + halfway_index
-        return chop(
-            number,
-            int_array[halfway_index::],
-            current_index
-        )
-    elif number_in_lower_half(number, int_array, halfway_index):
-        return chop(
-            number,
-            int_array[0:halfway_index]
-        )
+def adjusted_index(current_index, halfway_index):
+    return halfway_index + current_index
